@@ -4,9 +4,12 @@ import { evolution } from '@/lib/evolution'
 import clientPromise from '@/lib/mongodb'
 
 // In a real scenario, use a Service Role client to bypass RLS
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+// In a real scenario, use a Service Role client to bypass RLS
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "placeholder-key"
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"
+
 import { createClient } from '@supabase/supabase-js'
-const adminSupabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, SUPABASE_SERVICE_KEY!)
+const adminSupabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
 export async function GET(req: Request) {
     // Security Check (CRON_SECRET)
