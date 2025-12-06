@@ -4,6 +4,8 @@ import Link from 'next/link'
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CampaignsPage() {
     const supabase = createServerComponentClient({ cookies }, {
         supabaseUrl: SUPABASE_URL,
