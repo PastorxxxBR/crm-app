@@ -3,8 +3,13 @@ import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase'
+
 export default function AuthForm() {
-    const supabase = createClientComponentClient()
+    const supabase = createClientComponentClient({
+        supabaseUrl: SUPABASE_URL,
+        supabaseKey: SUPABASE_ANON_KEY
+    })
 
     return (
         <Auth

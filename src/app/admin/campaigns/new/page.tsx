@@ -4,9 +4,14 @@ import { useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase'
+
 export default function NewCampaignPage() {
     const router = useRouter()
-    const supabase = createClientComponentClient()
+    const supabase = createClientComponentClient({
+        supabaseUrl: SUPABASE_URL,
+        supabaseKey: SUPABASE_ANON_KEY
+    })
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

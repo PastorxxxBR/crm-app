@@ -2,8 +2,13 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase'
+
 export default async function CampaignsPage() {
-    const supabase = createServerComponentClient({ cookies })
+    const supabase = createServerComponentClient({ cookies }, {
+        supabaseUrl: SUPABASE_URL,
+        supabaseKey: SUPABASE_ANON_KEY
+    })
     const { data: campaigns } = await supabase.from('campaigns').select('*').order('created_at', { ascending: false })
 
     return (
@@ -34,8 +39,8 @@ export default async function CampaignsPage() {
                                 <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{campaign.name}</td>
                                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${campaign.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                            campaign.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
-                                                'bg-gray-100 text-gray-800'
+                                        campaign.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                                            'bg-gray-100 text-gray-800'
                                         }`}>
                                         {campaign.status}
                                     </span>
