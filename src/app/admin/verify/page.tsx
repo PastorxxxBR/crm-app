@@ -17,16 +17,16 @@ export default async function VerifyPage() {
         results.marketing = await mkt.analyzePerformance('mock-natal-2025', { reach: 500, clicks: 10, conversions: 2 })
     } catch (e: any) { results.marketing_error = e.message }
 
-    // 2. Marketplaces
+    // 2. Marketplaces (Fashion B2B Test)
     try {
         const mp = new MarketplacesAgent()
-        results.marketplaces = await mp.suggestPricing('Smartphone X', 1250, 1200)
+        results.marketplaces = await mp.suggestPricing('Vestido Linho Premium', 89.90, 85.00, 'wholesale')
     } catch (e: any) { results.marketplaces_error = e.message }
 
     // 3. BI
     try {
         const bi = new BIAgent()
-        results.bi = await bi.generateReport({ revenueHistory: [200, 180, 220], activeClients: 800, churn: 60 })
+        results.bi = await bi.generateReport({ revenueHistory: [15000, 18000, 22000], activeClients: 120, churn: 5 })
     } catch (e: any) { results.bi_error = e.message }
 
     // 4. Security
@@ -35,8 +35,8 @@ export default async function VerifyPage() {
         results.security = await sec.analyzeLog({
             events: [
                 { user: 'admin', status: 'success' },
-                { user: 'client_A', status: 'fail' },
-                { user: 'unknown_ip', status: 'fail_unauthorized', resource: '/admin/db' }
+                { user: 'client_loja_sp', status: 'fail' },
+                { user: 'unknown_ip', status: 'fail_unauthorized', resource: '/admin/wholesale_prices' }
             ]
         })
     } catch (e: any) { results.security_error = e.message }
@@ -44,25 +44,30 @@ export default async function VerifyPage() {
     // 5. Social Media
     try {
         const social = new SocialMediaAgent()
-        results.social = await social.analyzeAudience('instagram', [{ likes: 50 }, { likes: 120 }])
+        results.social = await social.analyzeAudience('instagram', [{ likes: 500 }, { likes: 1200 }])
     } catch (e: any) { results.social_error = e.message }
 
     // 6. Competitive
     try {
         const comp = new CompetitiveAgent()
-        results.competitive = await comp.monitorCompetitor('CompetitorX', 'http://example.com/product')
+        results.competitive = await comp.monitorCompetitor('ZaraCompetitor', 'http://store.com/summer-collection')
     } catch (e: any) { results.competitive_error = e.message }
 
-    // 7. Trending
+    // 7. Trending (Fashion)
     try {
         const trend = new TrendingAgent()
-        results.trending = await trend.analyzeSalesPatterns([{ name: 'Product A', sales: 150 }, { name: 'Product B', sales: 90 }])
+        const salesData = [
+            { name: 'Cropped Renda Branco', sales: 450, category: 'Tops' },
+            { name: 'Calça Alfaiataria Bege', sales: 300, category: 'Bottoms' },
+            { name: 'Jaqueta Couro (Inverno)', sales: 20, category: 'Outerwear' }
+        ]
+        results.trending = await trend.analyzeSalesPatterns(salesData)
     } catch (e: any) { results.trending_error = e.message }
 
-    // 8. Content
+    // 8. Content (Viral Fashion)
     try {
         const content = new ContentAgent()
-        results.content = await content.analyzeCreative('http://example.com/image.jpg', 'tiktok')
+        results.content = await content.analyzeCreative('http://cdn.store.com/provador_video.mp4', 'instagram')
     } catch (e: any) { results.content_error = e.message }
 
     return (

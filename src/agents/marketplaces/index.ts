@@ -15,10 +15,26 @@ export class MarketplacesAgent extends BaseAgent {
     }
 
     /**
-     * Suggest Optimal Pricing using Gemini
+     * Calculate Wholesale (B2B) Price based on Volume
      */
-    public async suggestPricing(sku: string, currentPrice: number, competitorPrice: number) {
-        this.log(`Analyzing pricing for ${sku}...`)
+    public calculateWholesalePrice(basePrice: number, qty: number): number {
+        // "Grade Fechada" logic:
+        // 1-5 pieces: 0% discount (Retail)
+        // 6-11 pieces: 15% discount
+        // 12+ pieces: 25% discount (Atacado Real)
+
+        let discount = 0;
+        if (qty >= 12) discount = 0.25;
+        else if (qty >= 6) discount = 0.15;
+
+        return Math.floor(basePrice * (1 - discount));
+    }
+
+    /**
+     * Suggest Optimal Pricing using Gemini (Retail vs Wholesale)
+     */
+    public async suggestPricing(sku: string, currentPrice: number, competitorPrice: number, type: 'retail' | 'wholesale' = 'retail') {
+        this.log(`Analyzing ${type} pricing for ${sku}...`)
 
         try {
             const { GoogleGenerativeAI } = await import("@google/generative-ai");
@@ -26,12 +42,16 @@ export class MarketplacesAgent extends BaseAgent {
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
             const prompt = `
-            Act as a E-commerce Pricing Specialist.
+            Act as a Fashion Pricing Specialist.
             Product: ${sku}
-            My Price: R$ ${currentPrice}
-            Competitor Avg Price: R$ ${competitorPrice}
+            My Base Price: R$ ${currentPrice}
+            Competitor Price: R$ ${competitorPrice}
+            Channel: ${type.toUpperCase()} (B2C vs B2B)
             
-            Determine the optimal price to maximize sales without losing margin (assume 20% margin).
+            Task: Determine optimal price.
+            - If RETAIL: Use psychological pricing (e.g., 99.90) and value perception.
+            - If WHOLESALE: Focus on volume and reseller margin.
+
             Return a JSON object: { "suggested_price": number, "reason": "string", "strategy": "aggressive|conservative" }
             No markdown.
         `
@@ -40,15 +60,17 @@ export class MarketplacesAgent extends BaseAgent {
             const text = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
             const suggestion = JSON.parse(text);
 
-            this.log(`Suggested Price: R$ ${suggestion.suggested_price}`)
-
-            // Persist to DB
-            // typically: await supabase.from('marketplace_suggestions').insert(...)
+            this.log(`Suggested ${type} Price: R$ ${suggestion.suggested_price}`)
 
             return suggestion
         } catch (e: any) {
             this.log(`Error suggesting price: ${e.message}`)
-            const fallback = { suggested_price: Math.floor(competitorPrice * 0.98), reason: "[FALLBACK] Competitor price undercut by 2% (AI Unavailable)", strategy: "competitive" }
+            const discount = type === 'wholesale' ? 0.70 : 0.98; // 30% off for wholesale fallback, 2% for retail
+            const fallback = {
+                suggested_price: Math.floor(competitorPrice * discount),
+                reason: `[FALLBACK] Calculated standard ${type} margin (AI Unavailable)`,
+                strategy: "competitive"
+            }
             return fallback
         }
     }
