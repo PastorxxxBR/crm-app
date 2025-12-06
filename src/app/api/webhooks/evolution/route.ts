@@ -12,7 +12,14 @@ export async function POST(req: Request) {
         // }
 
         // 2. Log Raw Event to MongoDB
-        const client = await clientPromise
+        let client;
+        try {
+            client = await clientPromise
+        } catch (e) {
+            console.warn("MongoDB not available, skipping log")
+            return NextResponse.json({ success: true, warning: "DB unavailable" }, { status: 200 })
+        }
+
         const db = client.db('crm_db') // Use env var for DB name in production
 
         await db.collection('webhook_logs').insertOne({

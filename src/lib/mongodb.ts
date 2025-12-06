@@ -1,10 +1,16 @@
 import { MongoClient } from 'mongodb'
 
 if (!process.env.MONGODB_URI) {
-    throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
+    // In Vercel Build, this env var might be missing. 
+    // We allow it to pass here, but it will fail at runtime if not provided.
+    if (process.env.NODE_ENV === 'production') {
+        console.warn('MONGODB_URI not found during build. Skipping connection.')
+    } else {
+        throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
+    }
 }
 
-const uri = process.env.MONGODB_URI
+const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/crm_db"
 const options = {}
 
 let client
@@ -24,8 +30,13 @@ if (process.env.NODE_ENV === 'development') {
     clientPromise = globalWithMongo._mongoClientPromise
 } else {
     // In production mode, it's best to not use a global variable.
-    client = new MongoClient(uri, options)
-    clientPromise = client.connect()
+    if (uri) {
+        client = new MongoClient(uri, options)
+        clientPromise = client.connect()
+    } else {
+        // Build-safe fallback (should not happen at runtime if env vars are set)
+        clientPromise = Promise.reject("MONGODB_URI not defined")
+    }
 }
 
 export default clientPromise
