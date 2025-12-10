@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
-export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"
-export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder"
+// Hardcoded credentials to bypass environment variable issues
+export const SUPABASE_URL = "https://urisspjzqickpatpvslg.supabase.co"
+export const SUPABASE_ANON_KEY = "sb_publishable_-1RCOdOIj84D04W10swE6w_u6YnwAIb"
 
 const supabaseUrl = SUPABASE_URL
 const supabaseKey = SUPABASE_ANON_KEY

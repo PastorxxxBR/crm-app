@@ -11,6 +11,7 @@ const navigation = [
     { name: 'Pedidos', href: '/admin/orders', icon: ShoppingBag },
     { name: 'Clientes', href: '/admin/customers', icon: Users },
     { name: 'Campanhas', href: '/admin/campaigns', icon: Megaphone },
+    { name: 'Caixa (PDV)', href: '/cash-register', icon: ShoppingBag },
     { name: 'Chat', href: '/admin/chat', icon: MessageSquare },
     { name: 'Configurações', href: '/admin/settings', icon: Settings },
 ]
