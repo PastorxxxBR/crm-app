@@ -3,17 +3,22 @@ import axios from 'axios'
 const EVO_API_URL = process.env.EVOLUTION_API_URL
 const EVO_API_KEY = process.env.EVOLUTION_API_KEY
 
-if (!EVO_API_URL || !EVO_API_KEY) {
-    console.warn('Evolution API credentials not found in environment variables.')
+const isConfigured = !!(EVO_API_URL && EVO_API_KEY)
+
+if (!isConfigured) {
+    console.warn('⚠️ Evolution API credentials not found in environment variables. WhatsApp features will be disabled.')
 }
 
-const api = axios.create({
+const api = isConfigured ? axios.create({
     baseURL: EVO_API_URL,
     headers: {
         'apikey': EVO_API_KEY,
         'Content-Type': 'application/json'
     }
-})
+}) : null
+
+// Helper to check if Evolution API is configured
+export const isEvolutionConfigured = () => isConfigured
 
 export const evolution = {
     /**
@@ -22,6 +27,9 @@ export const evolution = {
      * @param text Message content
      */
     sendMessage: async (number: string, text: string, instanceName: string = 'default') => {
+        if (!api) {
+            throw new Error('Evolution API not configured. Please set EVOLUTION_API_URL and EVOLUTION_API_KEY.')
+        }
         try {
             const response = await api.post(`/message/sendText/${instanceName}`, {
                 number,
@@ -45,6 +53,9 @@ export const evolution = {
      * Send a media message (image, video, document)
      */
     sendMedia: async (number: string, mediaUrl: string, caption: string, mediaType: 'image' | 'video' | 'document', instanceName: string = 'default') => {
+        if (!api) {
+            throw new Error('Evolution API not configured. Please set EVOLUTION_API_URL and EVOLUTION_API_KEY.')
+        }
         try {
             const response = await api.post(`/message/sendMedia/${instanceName}`, {
                 number,
@@ -69,6 +80,9 @@ export const evolution = {
      * Check connection status of an instance
      */
     checkConnection: async (instanceName: string = 'default') => {
+        if (!api) {
+            return { state: 'not_configured', error: 'Evolution API not configured' }
+        }
         try {
             const response = await api.get(`/instance/connectionState/${instanceName}`)
             return response.data

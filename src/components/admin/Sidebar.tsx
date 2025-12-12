@@ -3,13 +3,23 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, ShoppingBag, MessageSquare, Megaphone, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, Users, ShoppingBag, MessageSquare, Megaphone, Settings, LogOut, BarChart3, TrendingUp, Package, DollarSign, UserCheck, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Produtos Reais', href: '/admin/produtos-reais', icon: Package },
+    { name: 'Google Shopping', href: '/admin/google-shopping', icon: ShoppingBag },
+    { name: 'Mercado Livre', href: '/admin/mercado-livre', icon: ShoppingBag },
+    { name: 'Análise Competitiva', href: '/admin/analise-competitiva', icon: TrendingUp },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { name: 'Dashboard Meta', href: '/admin/meta-dashboard', icon: Zap },
+    { name: 'Market Intelligence', href: '/admin/market-intelligence', icon: TrendingUp },
+    { name: 'Produtos Marketplace', href: '/admin/marketplace-products', icon: Package },
+    { name: 'Taxas Marketplace', href: '/admin/marketplace-fees', icon: DollarSign },
     { name: 'Pedidos', href: '/admin/orders', icon: ShoppingBag },
     { name: 'Clientes', href: '/admin/customers', icon: Users },
+    { name: 'Perfil do Cliente', href: '/admin/customer-profile', icon: UserCheck },
     { name: 'Campanhas', href: '/admin/campaigns', icon: Megaphone },
     { name: 'Caixa (PDV)', href: '/cash-register', icon: ShoppingBag },
     { name: 'Chat', href: '/admin/chat', icon: MessageSquare },

@@ -11,6 +11,7 @@ import { TrendingAgent } from '../agents/trending'
 import { ContentAgent } from '../agents/content'
 import { EmailMarketingAgent } from '../agents/email-marketing'
 import { LoyaltyAgent } from '../agents/loyalty'
+import { GoogleMasterAgent } from '../agents/google-master'
 
 class AgentService {
     private static instance: AgentService
@@ -28,6 +29,7 @@ class AgentService {
     public content: ContentAgent
     public emailMarketing: EmailMarketingAgent
     public loyalty: LoyaltyAgent
+    public googleMaster: GoogleMasterAgent
 
     private constructor() {
         this.marketing = new MarketingAgent()
@@ -43,6 +45,7 @@ class AgentService {
         this.content = new ContentAgent()
         this.emailMarketing = new EmailMarketingAgent()
         this.loyalty = new LoyaltyAgent()
+        this.googleMaster = new GoogleMasterAgent()
     }
 
     public static getInstance(): AgentService {

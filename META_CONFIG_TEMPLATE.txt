@@ -1,0 +1,19 @@
+# ===================================
+# META INTEGRATION (Toca da Onça)
+# ===================================
+
+# App Credentials (do app "TOCA DA ONCA eco")
+META_APP_ID=
+META_APP_SECRET=
+
+# Access Token de Longa Duração (60 dias)
+META_ACCESS_TOKEN=
+
+# Account IDs
+META_AD_ACCOUNT_ID=
+META_PAGE_ID=
+META_INSTAGRAM_ID=
+META_WHATSAPP_PHONE_ID=
+META_BUSINESS_ID=
+
+# Siga o guia em: META_INTEGRATION_GUIDE.md
