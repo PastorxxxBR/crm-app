@@ -18,6 +18,7 @@ const navigation = [
     { name: 'Market Intelligence', href: '/admin/market-intelligence', icon: TrendingUp },
     { name: 'Produtos Marketplace', href: '/admin/marketplace-products', icon: Package },
     { name: 'Taxas Marketplace', href: '/admin/marketplace-fees', icon: DollarSign },
+    { name: 'Taxas de Pagamento', href: '/admin/payment-fees', icon: DollarSign },
     { name: 'Pedidos', href: '/admin/orders', icon: ShoppingBag },
     { name: 'Clientes', href: '/admin/customers', icon: Users },
     { name: 'Perfil do Cliente', href: '/admin/customer-profile', icon: UserCheck },
