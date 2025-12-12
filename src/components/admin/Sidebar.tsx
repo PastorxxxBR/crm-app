@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, ShoppingBag, MessageSquare, Megaphone, Settings, LogOut, BarChart3, TrendingUp, Package, DollarSign, UserCheck, Zap } from 'lucide-react'
+import { LayoutDashboard, Users, ShoppingBag, MessageSquare, Megaphone, Settings, LogOut, BarChart3, TrendingUp, Package, DollarSign, UserCheck, Zap, Music } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navigation = [
@@ -11,6 +11,7 @@ const navigation = [
     { name: 'Produtos Reais', href: '/admin/produtos-reais', icon: Package },
     { name: 'Google Shopping', href: '/admin/google-shopping', icon: ShoppingBag },
     { name: 'Mercado Livre', href: '/admin/mercado-livre', icon: ShoppingBag },
+    { name: 'TikTok Shopping', href: '/admin/tiktok', icon: Music },
     { name: 'Análise Competitiva', href: '/admin/analise-competitiva', icon: TrendingUp },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { name: 'Dashboard Meta', href: '/admin/meta-dashboard', icon: Zap },
