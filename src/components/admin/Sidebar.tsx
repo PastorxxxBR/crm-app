@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 
 const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'PDV / Caixa', href: '/admin/pos', icon: ShoppingBag },
     { name: 'Produtos Reais', href: '/admin/produtos-reais', icon: Package },
     { name: 'Google Shopping', href: '/admin/google-shopping', icon: ShoppingBag },
     { name: 'Mercado Livre', href: '/admin/mercado-livre', icon: ShoppingBag },
@@ -23,7 +24,6 @@ const navigation = [
     { name: 'Clientes', href: '/admin/customers', icon: Users },
     { name: 'Perfil do Cliente', href: '/admin/customer-profile', icon: UserCheck },
     { name: 'Campanhas', href: '/admin/campaigns', icon: Megaphone },
-    { name: 'Caixa (PDV)', href: '/cash-register', icon: ShoppingBag },
     { name: 'Chat', href: '/admin/chat', icon: MessageSquare },
     { name: 'Configurações', href: '/admin/settings', icon: Settings },
 ]
