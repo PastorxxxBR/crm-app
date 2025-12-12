@@ -1,26 +1,27 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { ArrowLeft, TrendingDown, TrendingUp, BarChart3, Store, Package, DollarSign, Users, ExternalLink, Sparkles } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
 
-interface CompetitorProduct {
+interface Product {
     id: string
     title: string
     price: number
-    seller: {
-        id: number
-        nickname: string
-    }
-    permalink: string
-    thumbnail: string
-    sold_quantity: number
+    seller: { id: number; name: string }
+    link: string
+    image: string
+    soldQuantity: number
+    freeShipping: boolean
 }
 
 interface CategoryAnalysis {
     category: string
     totalProducts: number
-    cheapest10: CompetitorProduct[]
-    expensive10: CompetitorProduct[]
-    average10: CompetitorProduct[]
+    cheapest10: Product[]
+    expensive10: Product[]
+    average10: Product[]
     priceRange: {
         min: number
         max: number
@@ -28,57 +29,53 @@ interface CategoryAnalysis {
         median: number
     }
     topSellers: Array<{
-        seller: string
-        sellerId: number
+        name: string
+        id: number
         totalProducts: number
         avgPrice: number
         totalSales: number
     }>
-    insights: string
 }
 
 const CATEGORIES = {
     'Feminino': [
-        { id: 'roupas-feminina', name: 'Roupas Feminina' },
-        { id: 'vestidos-feminino', name: 'Vestidos' },
-        { id: 'calcas-feminino', name: 'Calças' },
-        { id: 'blusas-feminino', name: 'Blusas' },
-        { id: 'saias-feminino', name: 'Saias' },
-        { id: 'conjuntos-feminino', name: 'Conjuntos' },
-        { id: 'calcados-feminino', name: 'Calçados' },
+        { id: 'roupas-feminina', name: 'Roupas Feminina', icon: '👗' },
+        { id: 'vestidos-feminino', name: 'Vestidos', icon: '👗' },
+        { id: 'calcas-feminino', name: 'Calças', icon: '👖' },
+        { id: 'blusas-feminino', name: 'Blusas', icon: '👚' },
+        { id: 'saias-feminino', name: 'Saias', icon: '🩱' },
+        { id: 'conjuntos-feminino', name: 'Conjuntos', icon: '👗' },
+        { id: 'calcados-feminino', name: 'Calçados', icon: '👠' },
     ],
     'Masculino': [
-        { id: 'roupas-masculino', name: 'Roupas Masculina' },
-        { id: 'calcados-masculino', name: 'Calçados' },
+        { id: 'roupas-masculino', name: 'Roupas Masculina', icon: '👔' },
+        { id: 'calcados-masculino', name: 'Calçados', icon: '👞' },
     ],
     'Infantil': [
-        { id: 'roupas-infantil', name: 'Roupas Infantil' },
-        { id: 'calcados-infantil', name: 'Calçados' },
+        { id: 'roupas-infantil', name: 'Roupas Infantil', icon: '👶' },
+        { id: 'calcados-infantil', name: 'Calçados', icon: '👟' },
     ]
 }
 
 export default function CompetitiveAnalysisPage() {
     const [selectedGender, setSelectedGender] = useState<string>('Feminino')
-    const [selectedCategory, setSelectedCategory] = useState<string>('roupas-feminina')
+    const [selectedCategory, setSelectedCategory] = useState<string>('conjuntos-feminino')
     const [analysis, setAnalysis] = useState<CategoryAnalysis | null>(null)
     const [loading, setLoading] = useState(false)
-    const [activeTab, setActiveTab] = useState<'cheapest' | 'expensive' | 'average'>('cheapest')
+    const [activeTab, setActiveTab] = useState<'cheapest' | 'expensive' | 'average'>('average')
 
     useEffect(() => {
-        if (selectedCategory) {
-            fetchAnalysis()
-        }
+        fetchAnalysis()
     }, [selectedCategory])
 
     const fetchAnalysis = async () => {
         setLoading(true)
         try {
             const response = await fetch(`/api/competitive/analyze?category=${selectedCategory}`)
-            const result = await response.json()
+            const data = await response.json()
 
-            if (result.success) {
-                setAnalysis(result.analysis)
-                console.log(`✅ Análise carregada: ${result.analysis.totalProducts} produtos`)
+            if (data.success) {
+                setAnalysis(data.analysis)
             }
         } catch (error) {
             console.error('Erro ao buscar análise:', error)
@@ -87,260 +84,282 @@ export default function CompetitiveAnalysisPage() {
         }
     }
 
-    const getProductList = () => {
-        if (!analysis) return []
-
-        switch (activeTab) {
-            case 'cheapest':
-                return analysis.cheapest10
-            case 'expensive':
-                return analysis.expensive10
-            case 'average':
-                return analysis.average10
-            default:
-                return []
-        }
-    }
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-                    <h2 className="text-xl font-semibold text-gray-900">Analisando concorrentes...</h2>
-                    <p className="text-gray-500 mt-2">Buscando dados reais do Mercado Livre</p>
-                </div>
-            </div>
-        )
-    }
+    const currentProducts = analysis ? {
+        'cheapest': analysis.cheapest10,
+        'expensive': analysis.expensive10,
+        'average': analysis.average10
+    }[activeTab] : []
 
     return (
-        <div className="space-y-6">
-            <header>
-                <h1 className="text-3xl font-bold text-gray-900">Inteligência Competitiva</h1>
-                <p className="text-gray-500">Análise completa dos concorrentes no Mercado Livre</p>
-            </header>
-
-            {/* Seleção de Gênero */}
-            <div className="flex gap-2">
-                {Object.keys(CATEGORIES).map(gender => (
-                    <button
-                        key={gender}
-                        onClick={() => {
-                            setSelectedGender(gender)
-                            const firstCategory = CATEGORIES[gender as keyof typeof CATEGORIES][0]
-                            setSelectedCategory(firstCategory.id)
-                        }}
-                        className={`px-6 py-3 rounded-lg font-semibold transition-colors ${selectedGender === gender
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        {gender}
-                    </button>
-                ))}
-            </div>
-
-            {/* Seleção de Categoria */}
-            <div className="flex gap-2 flex-wrap">
-                {CATEGORIES[selectedGender as keyof typeof CATEGORIES].map(cat => (
-                    <button
-                        key={cat.id}
-                        onClick={() => setSelectedCategory(cat.id)}
-                        className={`px-4 py-2 rounded-lg transition-colors ${selectedCategory === cat.id
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        {cat.name}
-                    </button>
-                ))}
-            </div>
-
-            {/* Estatísticas de Preço */}
-            {analysis && (
-                <>
-                    <div className="grid gap-4 md:grid-cols-5">
-                        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <h3 className="text-sm font-medium text-gray-500">Total Produtos</h3>
-                            <p className="text-2xl font-bold text-gray-900 mt-2">{analysis.totalProducts}</p>
-                        </div>
-                        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <h3 className="text-sm font-medium text-gray-500">Preço Mínimo</h3>
-                            <p className="text-2xl font-bold text-green-600 mt-2">
-                                R$ {analysis.priceRange.min.toFixed(2)}
-                            </p>
-                        </div>
-                        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <h3 className="text-sm font-medium text-gray-500">Preço Médio</h3>
-                            <p className="text-2xl font-bold text-blue-600 mt-2">
-                                R$ {analysis.priceRange.avg.toFixed(2)}
-                            </p>
-                        </div>
-                        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <h3 className="text-sm font-medium text-gray-500">Preço Mediano</h3>
-                            <p className="text-2xl font-bold text-purple-600 mt-2">
-                                R$ {analysis.priceRange.median.toFixed(2)}
-                            </p>
-                        </div>
-                        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <h3 className="text-sm font-medium text-gray-500">Preço Máximo</h3>
-                            <p className="text-2xl font-bold text-red-600 mt-2">
-                                R$ {analysis.priceRange.max.toFixed(2)}
-                            </p>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <Link href="/admin" className="text-gray-600 hover:text-gray-900 transition-colors">
+                                <ArrowLeft className="w-6 h-6" />
+                            </Link>
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                                    <Sparkles className="w-6 h-6 text-purple-600" />
+                                    Inteligência Competitiva
+                                </h1>
+                                <p className="text-sm text-gray-600">Análise completa dos concorrentes no Mercado Livre</p>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    {/* Tabs de Produtos */}
-                    <div className="rounded-xl border border-gray-100 bg-white shadow-sm">
-                        <div className="border-b border-gray-200">
-                            <div className="flex">
-                                <button
-                                    onClick={() => setActiveTab('cheapest')}
-                                    className={`px-6 py-4 font-semibold transition-colors ${activeTab === 'cheapest'
-                                        ? 'border-b-2 border-green-600 text-green-600'
-                                        : 'text-gray-500 hover:text-gray-700'
-                                        }`}
-                                >
-                                    🏆 Top 10 Mais Baratos
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('expensive')}
-                                    className={`px-6 py-4 font-semibold transition-colors ${activeTab === 'expensive'
-                                        ? 'border-b-2 border-red-600 text-red-600'
-                                        : 'text-gray-500 hover:text-gray-700'
-                                        }`}
-                                >
-                                    💎 Top 10 Mais Caros
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('average')}
-                                    className={`px-6 py-4 font-semibold transition-colors ${activeTab === 'average'
-                                        ? 'border-b-2 border-blue-600 text-blue-600'
-                                        : 'text-gray-500 hover:text-gray-700'
-                                        }`}
-                                >
-                                    📊 Top 10 Preço Médio
-                                </button>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Gender Tabs */}
+                <div className="flex gap-3 mb-6">
+                    {Object.keys(CATEGORIES).map((gender) => (
+                        <button
+                            key={gender}
+                            onClick={() => {
+                                setSelectedGender(gender)
+                                setSelectedCategory(CATEGORIES[gender as keyof typeof CATEGORIES][0].id)
+                            }}
+                            className={`px-6 py-3 rounded-xl font-semibold transition-all ${selectedGender === gender
+                                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-200'
+                                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                                }`}
+                        >
+                            {gender}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Category Pills */}
+                <div className="flex flex-wrap gap-3 mb-8">
+                    {CATEGORIES[selectedGender as keyof typeof CATEGORIES].map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setSelectedCategory(cat.id)}
+                            className={`px-5 py-2.5 rounded-full font-medium transition-all flex items-center gap-2 ${selectedCategory === cat.id
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
+                                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                                }`}
+                        >
+                            <span>{cat.icon}</span>
+                            {cat.name}
+                        </button>
+                    ))}
+                </div>
+
+                {loading ? (
+                    <div className="flex items-center justify-center py-20">
+                        <div className="text-center">
+                            <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+                            <p className="text-gray-600">Analisando concorrentes...</p>
+                        </div>
+                    </div>
+                ) : analysis ? (
+                    <>
+                        {/* Stats Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <Package className="w-5 h-5 text-gray-600" />
+                                    <p className="text-sm text-gray-600 font-medium">Total Produtos</p>
+                                </div>
+                                <p className="text-3xl font-bold text-gray-900">{analysis.totalProducts}</p>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <TrendingDown className="w-5 h-5 text-green-600" />
+                                    <p className="text-sm text-green-700 font-medium">Preço Mínimo</p>
+                                </div>
+                                <p className="text-3xl font-bold text-green-600">R$ {analysis.priceRange.min.toFixed(2)}</p>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <BarChart3 className="w-5 h-5 text-blue-600" />
+                                    <p className="text-sm text-blue-700 font-medium">Preço Médio</p>
+                                </div>
+                                <p className="text-3xl font-bold text-blue-600">R$ {analysis.priceRange.avg.toFixed(2)}</p>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-6 border border-purple-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <DollarSign className="w-5 h-5 text-purple-600" />
+                                    <p className="text-sm text-purple-700 font-medium">Preço Mediano</p>
+                                </div>
+                                <p className="text-3xl font-bold text-purple-600">R$ {analysis.priceRange.median.toFixed(2)}</p>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl p-6 border border-red-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <TrendingUp className="w-5 h-5 text-red-600" />
+                                    <p className="text-sm text-red-700 font-medium">Preço Máximo</p>
+                                </div>
+                                <p className="text-3xl font-bold text-red-600">R$ {analysis.priceRange.max.toFixed(2)}</p>
                             </div>
                         </div>
 
-                        <div className="p-6">
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-                                {getProductList().map((product, index) => (
-                                    <div key={product.id} className="rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                                        <div className="relative">
-                                            <img
-                                                src={product.thumbnail.replace('-I.jpg', '-O.jpg')}
-                                                alt={product.title}
-                                                className="w-full h-48 object-cover"
-                                            />
-                                            <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm font-bold">
+                        {/* Product Tabs */}
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-8">
+                            <div className="border-b border-gray-200 px-6">
+                                <div className="flex gap-1">
+                                    <button
+                                        onClick={() => setActiveTab('cheapest')}
+                                        className={`px-6 py-4 font-semibold transition-all relative ${activeTab === 'cheapest'
+                                                ? 'text-green-600'
+                                                : 'text-gray-600 hover:text-gray-900'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <TrendingDown className="w-5 h-5" />
+                                            Top 10 Mais Baratos
+                                        </div>
+                                        {activeTab === 'cheapest' && (
+                                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-600 rounded-t"></div>
+                                        )}
+                                    </button>
+
+                                    <button
+                                        onClick={() => setActiveTab('expensive')}
+                                        className={`px-6 py-4 font-semibold transition-all relative ${activeTab === 'expensive'
+                                                ? 'text-red-600'
+                                                : 'text-gray-600 hover:text-gray-900'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <TrendingUp className="w-5 h-5" />
+                                            Top 10 Mais Caros
+                                        </div>
+                                        {activeTab === 'expensive' && (
+                                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-red-600 rounded-t"></div>
+                                        )}
+                                    </button>
+
+                                    <button
+                                        onClick={() => setActiveTab('average')}
+                                        className={`px-6 py-4 font-semibold transition-all relative ${activeTab === 'average'
+                                                ? 'text-blue-600'
+                                                : 'text-gray-600 hover:text-gray-900'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <BarChart3 className="w-5 h-5" />
+                                            Top 10 Preço Médio
+                                        </div>
+                                        {activeTab === 'average' && (
+                                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t"></div>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Products Grid */}
+                            <div className="p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                                    {currentProducts.map((product, index) => (
+                                        <div key={product.id} className="group relative bg-gray-50 rounded-xl p-4 hover:shadow-lg transition-all border border-gray-100 hover:border-purple-200">
+                                            <div className="absolute top-2 left-2 bg-gray-900 text-white text-xs font-bold px-2 py-1 rounded-full">
                                                 #{index + 1}
                                             </div>
-                                        </div>
-                                        <div className="p-3">
-                                            <p className="text-lg font-bold text-purple-600 mb-1">
-                                                R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                            </p>
-                                            <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
+
+                                            <div className="aspect-square bg-white rounded-lg mb-3 overflow-hidden">
+                                                <img
+                                                    src={product.image}
+                                                    alt={product.title}
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                                />
+                                            </div>
+
+                                            <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2 min-h-[40px]">
                                                 {product.title}
                                             </h3>
-                                            <div className="flex justify-between text-xs text-gray-600 mb-2">
-                                                <span>Vendidos: <strong>{product.sold_quantity}</strong></span>
+
+                                            <div className="space-y-2">
+                                                <p className="text-2xl font-bold text-purple-600">
+                                                    R$ {product.price.toFixed(2)}
+                                                </p>
+
+                                                <div className="flex items-center justify-between text-xs text-gray-600">
+                                                    <span className="flex items-center gap-1">
+                                                        <Store className="w-3 h-3" />
+                                                        {product.seller.name}
+                                                    </span>
+                                                </div>
+
+                                                <div className="flex items-center justify-between text-xs">
+                                                    <span className="text-green-600 font-medium">
+                                                        {product.soldQuantity} vendidos
+                                                    </span>
+                                                    {product.freeShipping && (
+                                                        <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                                                            Frete Grátis
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <a
+                                                    href={product.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center py-2 rounded-lg font-medium transition-colors text-sm mt-3"
+                                                >
+                                                    Ver Produto
+                                                    <ExternalLink className="w-3 h-3 inline ml-1" />
+                                                </a>
                                             </div>
-                                            <p className="text-xs text-gray-500 mb-2">
-                                                Vendedor: <strong>{product.seller.nickname}</strong>
-                                            </p>
-                                            <a
-                                                href={product.permalink}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                                            >
-                                                Ver no ML →
-                                            </a>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Top Vendedores */}
-                    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">🏅 Top 10 Vendedores</h3>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead>
-                                    <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vendedor</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produtos</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vendas</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Preço Médio</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                    {analysis.topSellers.map((seller, index) => (
-                                        <tr key={seller.sellerId} className="hover:bg-gray-50">
-                                            <td className="px-4 py-3 text-sm font-bold text-gray-900">#{index + 1}</td>
-                                            <td className="px-4 py-3 text-sm font-medium text-gray-900">{seller.seller}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-600">{seller.totalProducts}</td>
-                                            <td className="px-4 py-3 text-sm font-semibold text-green-600">{seller.totalSales}</td>
-                                            <td className="px-4 py-3 text-sm font-semibold text-purple-600">
-                                                R$ {seller.avgPrice.toFixed(2)}
-                                            </td>
-                                            <td className="px-4 py-3 text-sm">
-                                                <button
-                                                    onClick={() => window.open(`/api/competitive/seller?sellerId=${seller.sellerId}`, '_blank')}
-                                                    className="text-blue-600 hover:text-blue-700 font-medium"
-                                                >
-                                                    Ver Dados →
-                                                </button>
-                                            </td>
+                        {/* Top Sellers */}
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                            <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                <Users className="w-6 h-6 text-purple-600" />
+                                Top 10 Vendedores
+                            </h3>
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b border-gray-200">
+                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">#</th>
+                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Vendedor</th>
+                                            <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">Produtos</th>
+                                            <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">Vendas</th>
+                                            <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Preço Médio</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {analysis.topSellers.map((seller, index) => (
+                                            <tr key={seller.id} className="border-b border-gray-100 hover:bg-purple-50 transition-colors">
+                                                <td className="py-4 px-4">
+                                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600 font-bold text-sm">
+                                                        {index + 1}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-4 font-medium text-gray-900">{seller.name}</td>
+                                                <td className="py-4 px-4 text-center text-gray-700">{seller.totalProducts}</td>
+                                                <td className="py-4 px-4 text-center">
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                                                        {seller.totalSales.toLocaleString()}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-4 text-right font-semibold text-purple-600">
+                                                    R$ {seller.avgPrice.toFixed(2)}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-
-                    {/* Insights com IA */}
-                    <div className="rounded-xl border border-purple-100 bg-purple-50 p-6">
-                        <h3 className="text-lg font-semibold text-purple-900 mb-3">
-                            🤖 Análise Estratégica
-                        </h3>
-                        <div className="prose prose-sm max-w-none text-purple-900">
-                            <h4>📊 Análise de Preços:</h4>
-                            <ul>
-                                <li><strong>Faixa de Preço:</strong> R$ {analysis.priceRange.min.toFixed(2)} - R$ {analysis.priceRange.max.toFixed(2)}</li>
-                                <li><strong>Preço Médio do Mercado:</strong> R$ {analysis.priceRange.avg.toFixed(2)}</li>
-                                <li><strong>Preço Mediano:</strong> R$ {analysis.priceRange.median.toFixed(2)}</li>
-                                <li><strong>Variação:</strong> {((analysis.priceRange.max - analysis.priceRange.min) / analysis.priceRange.min * 100).toFixed(0)}%</li>
-                            </ul>
-
-                            <h4>🎯 Recomendações:</h4>
-                            <ul>
-                                <li><strong>Para Competir em Preço:</strong> Fique abaixo de R$ {analysis.priceRange.avg.toFixed(2)}</li>
-                                <li><strong>Para Posicionamento Médio:</strong> Entre R$ {(analysis.priceRange.avg * 0.9).toFixed(2)} e R$ {(analysis.priceRange.avg * 1.1).toFixed(2)}</li>
-                                <li><strong>Para Posicionamento Premium:</strong> Acima de R$ {(analysis.priceRange.avg * 1.2).toFixed(2)}</li>
-                            </ul>
-
-                            <h4>🏆 Principais Concorrentes:</h4>
-                            <p>Os top 3 vendedores dominam {((analysis.topSellers.slice(0, 3).reduce((sum, s) => sum + s.totalSales, 0) / analysis.topSellers.reduce((sum, s) => sum + s.totalSales, 0)) * 100).toFixed(0)}% das vendas nesta categoria.</p>
-
-                            <h4>💡 Oportunidades:</h4>
-                            <ul>
-                                <li>Produtos mais vendidos estão na faixa de R$ {analysis.cheapest10[0]?.price.toFixed(2)} - R$ {analysis.cheapest10[4]?.price.toFixed(2)}</li>
-                                <li>Há espaço para produtos premium acima de R$ {analysis.priceRange.avg.toFixed(2)}</li>
-                                <li>Frete grátis é um diferencial importante</li>
-                            </ul>
-                        </div>
-                    </div>
-                </>
-            )}
+                    </>
+                ) : null}
+            </div>
         </div>
     )
 }
