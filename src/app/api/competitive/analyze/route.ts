@@ -1,30 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getRealisticData } from '@/lib/realisticMLData'
+import { analyzeRealCategory, SEARCH_TERMS } from '@/lib/realMLScraperV2'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams
         const category = searchParams.get('category') || 'roupas-feminina'
 
-        console.log(`🔍 Buscando: ${category}`)
+        console.log(`🔍 API: Analisando categoria: ${category}`)
 
-        // Usar dados realistas
-        const analysis = getRealisticData(category)
+        // Pegar termo de busca
+        const searchTerm = SEARCH_TERMS[category] || category
 
-        console.log(`✅ ${analysis.totalProducts} produtos carregados!`)
+        // Buscar dados REAIS do Mercado Livre
+        const analysis = await analyzeRealCategory(searchTerm)
+
+        console.log(`✅ API: ${analysis.totalProducts} produtos analisados!`)
 
         return NextResponse.json({
             success: true,
             category,
+            searchTerm,
             analysis,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            cached: false
+        }, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600'
+            }
         })
     } catch (error: any) {
-        console.error('❌ Erro:', error)
+        console.error('❌ API Error:', error)
+
         return NextResponse.json(
             {
-                error: error.message || 'Erro ao buscar',
-                details: error.toString()
+                success: false,
+                error: error.message || 'Erro ao buscar dados',
+                details: process.env.NODE_ENV === 'development' ? error.toString() : undefined
             },
             { status: 500 }
         )
