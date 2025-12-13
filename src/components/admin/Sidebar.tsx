@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'PDV / Caixa', href: '/admin/pos', icon: ShoppingBag },
+    { name: 'Cadastrar Produtos', href: '/admin/products-upload', icon: Package },
     { name: 'Otimizador SEO', href: '/admin/seo-optimizer', icon: TrendingUp },
     { name: 'Produtos Reais', href: '/admin/produtos-reais', icon: Package },
     { name: 'Google Shopping', href: '/admin/google-shopping', icon: ShoppingBag },

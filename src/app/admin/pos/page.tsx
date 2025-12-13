@@ -178,15 +178,37 @@ export default function POSPage() {
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4">Produtos</h2>
 
-                            {/* Busca */}
-                            <input
-                                type="text"
-                                placeholder="Buscar produto ou código de barras..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-6 text-lg"
-                                autoFocus
-                            />
+                            {/* Busca com suporte a leitor de código de barras */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    🔍 Buscar Produto ou 📷 Ler Código de Barras
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Digite o nome ou passe o código de barras..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        // Detectar Enter do leitor de código de barras
+                                        if (e.key === 'Enter' && searchTerm.trim()) {
+                                            e.preventDefault()
+                                            // Buscar produto por código de barras
+                                            const product = products.find(p => p.barcode === searchTerm.trim())
+                                            if (product) {
+                                                addToCart(product)
+                                                setSearchTerm('') // Limpar busca
+                                            } else {
+                                                toast.error('Produto não encontrado!')
+                                            }
+                                        }
+                                    }}
+                                    className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                    autoFocus
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    💡 Dica: Conecte o leitor de código de barras USB e passe o produto
+                                </p>
+                            </div>
 
                             {/* Grid de produtos */}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
@@ -306,8 +328,8 @@ export default function POSPage() {
                                     <button
                                         onClick={() => setSelectedPayment('pix')}
                                         className={`p-3 rounded-lg border-2 transition-all ${selectedPayment === 'pix'
-                                                ? 'border-blue-500 bg-blue-50'
-                                                : 'border-gray-300 hover:border-gray-400'
+                                            ? 'border-blue-500 bg-blue-50'
+                                            : 'border-gray-300 hover:border-gray-400'
                                             }`}
                                     >
                                         <Smartphone className="w-5 h-5 mx-auto mb-1" />
@@ -316,8 +338,8 @@ export default function POSPage() {
                                     <button
                                         onClick={() => setSelectedPayment('cash')}
                                         className={`p-3 rounded-lg border-2 transition-all ${selectedPayment === 'cash'
-                                                ? 'border-blue-500 bg-blue-50'
-                                                : 'border-gray-300 hover:border-gray-400'
+                                            ? 'border-blue-500 bg-blue-50'
+                                            : 'border-gray-300 hover:border-gray-400'
                                             }`}
                                     >
                                         <Banknote className="w-5 h-5 mx-auto mb-1" />
@@ -326,8 +348,8 @@ export default function POSPage() {
                                     <button
                                         onClick={() => setSelectedPayment('debit')}
                                         className={`p-3 rounded-lg border-2 transition-all ${selectedPayment === 'debit'
-                                                ? 'border-blue-500 bg-blue-50'
-                                                : 'border-gray-300 hover:border-gray-400'
+                                            ? 'border-blue-500 bg-blue-50'
+                                            : 'border-gray-300 hover:border-gray-400'
                                             }`}
                                     >
                                         <CreditCard className="w-5 h-5 mx-auto mb-1" />
@@ -336,8 +358,8 @@ export default function POSPage() {
                                     <button
                                         onClick={() => setSelectedPayment('credit')}
                                         className={`p-3 rounded-lg border-2 transition-all ${selectedPayment === 'credit'
-                                                ? 'border-blue-500 bg-blue-50'
-                                                : 'border-gray-300 hover:border-gray-400'
+                                            ? 'border-blue-500 bg-blue-50'
+                                            : 'border-gray-300 hover:border-gray-400'
                                             }`}
                                     >
                                         <CreditCard className="w-5 h-5 mx-auto mb-1" />
