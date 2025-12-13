@@ -3,31 +3,51 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, ShoppingBag, MessageSquare, Megaphone, Settings, LogOut, BarChart3, TrendingUp, Package, DollarSign, UserCheck, Zap, Music } from 'lucide-react'
+import { LayoutDashboard, Users, ShoppingBag, MessageSquare, Megaphone, Settings, LogOut, BarChart3, TrendingUp, Package, DollarSign, UserCheck, Zap, Music, Kanban, CheckSquare, Calendar as CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+
+    // Sprint 1 - Novas Funcionalidades
+    { name: 'Pipeline de Vendas', href: '/admin/pipeline', icon: Kanban },
+    { name: 'Tarefas', href: '/admin/tasks', icon: CheckSquare },
+    { name: 'Calendário', href: '/admin/calendar', icon: CalendarIcon },
+
+    // Lojas e Estoque
     { name: 'Lojas', href: '/admin/stores', icon: Package },
+    { name: 'Alertas de Estoque', href: '/admin/stock-alerts', icon: TrendingUp },
     { name: 'PDV / Caixa', href: '/admin/pos', icon: ShoppingBag },
+
+    // Produtos
     { name: 'Cadastrar Produtos', href: '/admin/products-upload', icon: Package },
     { name: 'Otimizador SEO', href: '/admin/seo-optimizer', icon: TrendingUp },
     { name: 'Produtos Reais', href: '/admin/produtos-reais', icon: Package },
+
+    // Marketplaces
     { name: 'Google Shopping', href: '/admin/google-shopping', icon: ShoppingBag },
     { name: 'Mercado Livre', href: '/admin/mercado-livre', icon: ShoppingBag },
     { name: 'TikTok Shopping', href: '/admin/tiktok', icon: Music },
+
+    // Analytics
     { name: 'Análise Competitiva', href: '/admin/analise-competitiva', icon: TrendingUp },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { name: 'Dashboard Meta', href: '/admin/meta-dashboard', icon: Zap },
     { name: 'Market Intelligence', href: '/admin/market-intelligence', icon: TrendingUp },
+
+    // Produtos e Taxas
     { name: 'Produtos Marketplace', href: '/admin/marketplace-products', icon: Package },
     { name: 'Taxas Marketplace', href: '/admin/marketplace-fees', icon: DollarSign },
     { name: 'Taxas de Pagamento', href: '/admin/payment-fees', icon: DollarSign },
+
+    // CRM
     { name: 'Pedidos', href: '/admin/orders', icon: ShoppingBag },
     { name: 'Clientes', href: '/admin/customers', icon: Users },
     { name: 'Perfil do Cliente', href: '/admin/customer-profile', icon: UserCheck },
     { name: 'Campanhas', href: '/admin/campaigns', icon: Megaphone },
     { name: 'Chat', href: '/admin/chat', icon: MessageSquare },
+
+    // Configurações
     { name: 'Configurações', href: '/admin/settings', icon: Settings },
 ]
 
