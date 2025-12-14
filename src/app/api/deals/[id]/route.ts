@@ -13,7 +13,6 @@ export async function GET(
             .from('deals')
             .select(`
         *,
-        customer:customers(id, name, email, phone),
         stage:pipeline_stages(*),
         pipeline:pipelines(*),
         products:deal_products(*),
@@ -78,7 +77,6 @@ export async function PATCH(
             .eq('id', params.id)
             .select(`
         *,
-        customer:customers(id, name, email, phone),
         stage:pipeline_stages(*),
         pipeline:pipelines(*)
       `)

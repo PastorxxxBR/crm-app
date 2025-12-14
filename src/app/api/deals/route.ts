@@ -16,7 +16,6 @@ export async function GET(request: NextRequest) {
             .from('deals')
             .select(`
         *,
-        customer:customers(id, name, email, phone),
         stage:pipeline_stages(*),
         pipeline:pipelines(*)
       `)
@@ -89,7 +88,6 @@ export async function POST(request: NextRequest) {
             })
             .select(`
         *,
-        customer:customers(id, name, email, phone),
         stage:pipeline_stages(*),
         pipeline:pipelines(*)
       `)

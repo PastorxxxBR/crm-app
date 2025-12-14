@@ -52,14 +52,16 @@ export function PipelineKanban({ pipelineId }: PipelineKanbanProps) {
             // Carregar estágios
             const stagesRes = await fetch(`/api/pipelines/${pipelineId}/stages`);
             const stagesData = await stagesRes.json();
-            setStages(stagesData);
+            setStages(Array.isArray(stagesData) ? stagesData : []);
 
             // Carregar deals
             const dealsRes = await fetch(`/api/deals?pipeline_id=${pipelineId}&status=open`);
             const dealsData = await dealsRes.json();
-            setDeals(dealsData);
+            setDeals(Array.isArray(dealsData) ? dealsData : []);
         } catch (error) {
             console.error('Error loading pipeline data:', error);
+            setStages([]);
+            setDeals([]);
         } finally {
             setLoading(false);
         }
